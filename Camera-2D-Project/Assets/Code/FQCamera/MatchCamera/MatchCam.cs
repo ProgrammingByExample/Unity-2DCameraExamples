@@ -36,6 +36,7 @@ namespace Code.FQCamera.MatchCamera
         private void Start()
         {
             this.haveLoggedSubjectIsNull = false;
+            this.haveLoggedCameraIsNull = false;
         }
 
         /// <summary>
@@ -43,7 +44,34 @@ namespace Code.FQCamera.MatchCamera
         /// </summary>
         private void Update()
         {
+            if (VerifyGivenObjects())
+            {
+                return;
+            }
+
             MoveCameraToSubject(Subject, Camera);
+        }
+
+        /// <summary>
+        /// Verifies the Objects used for the <see cref="MatchCam"/> class.
+        /// </summary>
+        /// <returns> True means valid. </returns>
+        private bool VerifyGivenObjects()
+        {
+            bool objectIsValid = true;
+            if (Subject.Equals(null))
+            {
+                LogWarningWithinObject("There is no Subject to follow.", ref this.haveLoggedSubjectIsNull);
+                objectIsValid = false;
+            }
+            
+            if (Camera.Equals(null))
+            {
+                LogWarningWithinObject("There is no Camera to move.", ref this.haveLoggedCameraIsNull);
+                objectIsValid = false;
+            }
+
+            return objectIsValid;
         }
 
         /// <summary>
@@ -53,18 +81,6 @@ namespace Code.FQCamera.MatchCamera
         /// <param name="camera"> Camera to move. </param>
         private void MoveCameraToSubject(Transform subject, Transform camera)
         {
-            if (subject is null)
-            {
-                LogWarningWithinObject("There is no Subject to follow.", ref this.haveLoggedSubjectIsNull);
-                return;
-            }
-            
-            if (camera is null)
-            {
-                LogWarningWithinObject("There is no Camera to move.", ref this.haveLoggedSubjectIsNull);
-                return;
-            }
-            
             Vector3 newPosition = subject.position;
             camera.position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
         }
