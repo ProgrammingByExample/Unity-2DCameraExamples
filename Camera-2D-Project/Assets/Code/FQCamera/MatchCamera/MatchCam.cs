@@ -44,7 +44,7 @@ namespace Code.FQCamera.MatchCamera
         /// </summary>
         private void Update()
         {
-            if (VerifyGivenObjects())
+            if (!VerifyGivenObjects())
             {
                 return;
             }
