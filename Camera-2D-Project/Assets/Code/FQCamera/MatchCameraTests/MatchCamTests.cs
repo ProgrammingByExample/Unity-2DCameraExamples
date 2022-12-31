@@ -29,6 +29,10 @@ namespace Code.FQCamera.MatchCameraTests
             testMatchCam = holderObject.AddComponent<MatchCam>();
             testMatchCam.Camera = cameraLocation;
             testMatchCam.Subject = subjectLocation;
+            
+            // Simply stops the class from logging messages.
+            testMatchCam.haveLoggedCameraIsNull = true;
+            testMatchCam.haveLoggedSubjectIsNull = true;
         }
 
         [TearDown]
@@ -81,7 +85,7 @@ namespace Code.FQCamera.MatchCameraTests
         }
 
         [UnityTest]
-        public IEnumerator FrameAdvance_CameraPositionEqualsSubjectTest() 
+        public IEnumerator FrameAdvance_CameraPositionMatchesX_WhenSubjectMovesTest() 
         {
             // Arrange
             subjectLocation.position = new Vector3(12, 34, 56);
@@ -91,7 +95,38 @@ namespace Code.FQCamera.MatchCameraTests
             yield return new WaitForEndOfFrame();
 
             // Assert
-            Assert.AreEqual(subjectLocation.position, cameraLocation.position);
+            Assert.AreEqual(subjectLocation.position.x, cameraLocation.position.x);
+        }
+        
+        [UnityTest]
+        public IEnumerator FrameAdvance_CameraPositionMatchesY_WhenSubjectMovesTest() 
+        {
+            // Arrange
+            subjectLocation.position = new Vector3(12, 34, 56);
+
+            // Act
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+
+            // Assert
+            Assert.AreEqual(subjectLocation.position.y, cameraLocation.position.y);
+        }
+        
+        [UnityTest]
+        public IEnumerator FrameAdvance_CameraZDoesNotChange_WhenSubjectMovesTest()
+        {
+            int expectedZ = -4;
+            
+            // Arrange
+            cameraLocation.position = new Vector3(3, 6, expectedZ);
+            subjectLocation.position = new Vector3(12, 34, 56);
+
+            // Act
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+
+            // Assert
+            Assert.AreEqual(expectedZ, cameraLocation.position.z);
         }
     }
 }

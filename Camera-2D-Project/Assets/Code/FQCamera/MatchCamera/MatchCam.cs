@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("MatchCameraTests")]
 namespace Code.FQCamera.MatchCamera
 {
     /// <summary>
@@ -22,13 +24,13 @@ namespace Code.FQCamera.MatchCamera
         /// True means the Subject having a null state has already been logged.
         /// This is for performance and to avoid Logging 60 times a second.
         /// </summary>
-        private bool haveLoggedSubjectIsNull;
+        internal bool haveLoggedSubjectIsNull;
         
         /// <summary>
         /// True means the Camera being null has already been logged.
         /// This is for performance and to avoid Logging 60 times a second.
         /// </summary>
-        private bool haveLoggedCameraIsNull;
+        internal bool haveLoggedCameraIsNull;
 
         /// <summary>
         /// Occurs at the start of the Objects life on the frame.
@@ -59,13 +61,13 @@ namespace Code.FQCamera.MatchCamera
         private bool VerifyGivenObjects()
         {
             bool objectIsValid = true;
-            if (Subject.Equals(null))
+            if (Subject == null)
             {
                 LogWarningWithinObject("There is no Subject to follow.", ref this.haveLoggedSubjectIsNull);
                 objectIsValid = false;
             }
             
-            if (Camera.Equals(null))
+            if (Camera == null)
             {
                 LogWarningWithinObject("There is no Camera to move.", ref this.haveLoggedCameraIsNull);
                 objectIsValid = false;
@@ -82,7 +84,8 @@ namespace Code.FQCamera.MatchCamera
         private void MoveCameraToSubject(Transform subject, Transform camera)
         {
             Vector3 newPosition = subject.position;
-            camera.position = new Vector3(newPosition.x, newPosition.y, newPosition.z);
+            Vector3 cameraPosition = camera.position;
+            camera.position = new Vector3(newPosition.x, newPosition.y, cameraPosition.z);
         }
         
         /// <summary>
