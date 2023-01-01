@@ -6,9 +6,9 @@ using UnityEngine.TestTools;
 
 namespace Code.FQCamera.FollowCameraPlayTests
 {
-    public class MatchingCameraTests
+    public class MovingCameraTests
     {
-        private MatchingCamera testMatchingCamera;
+        private TestMovingCamera testMovingCamera;
         private Transform cameraLocation;
         private Transform subjectLocation;
 
@@ -26,9 +26,13 @@ namespace Code.FQCamera.FollowCameraPlayTests
             subjectLocation = subjectObject.GetComponent<Transform>();
             
             holderObject = new GameObject();
-            testMatchingCamera = holderObject.AddComponent<MatchingCamera>();
-            testMatchingCamera.Camera = cameraLocation;
-            testMatchingCamera.Subject = subjectLocation;
+            testMovingCamera = holderObject.AddComponent<TestMovingCamera>();
+            testMovingCamera.Camera = cameraLocation;
+            testMovingCamera.Subject = subjectLocation;
+            
+            // Simply stops the class from logging messages.
+            testMovingCamera.haveLoggedCameraIsNull = true;
+            testMovingCamera.haveLoggedSubjectIsNull = true;
         }
 
         [TearDown]
@@ -38,50 +42,58 @@ namespace Code.FQCamera.FollowCameraPlayTests
             Object.DestroyImmediate(subjectObject);
             Object.DestroyImmediate(holderObject);
         }
-
+        
         [UnityTest]
-        public IEnumerator FrameAdvance_CameraPositionMatchesX_WhenSubjectMovesTest() 
+        public IEnumerator FrameAdvance_NoErrorsThrown_WhenNoCameraGivenTest() 
         {
             // Arrange
-            subjectLocation.position = new Vector3(12, 34, 56);
+            testMovingCamera.Camera = null;
 
             // Act
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
             // Assert
-            Assert.AreEqual(subjectLocation.position.x, cameraLocation.position.x);
+            Assert.Pass();
         }
         
         [UnityTest]
-        public IEnumerator FrameAdvance_CameraPositionMatchesY_WhenSubjectMovesTest() 
+        public IEnumerator FrameAdvance_NoErrorsThrown_WhenNoSubjectGivenTest() 
         {
             // Arrange
-            subjectLocation.position = new Vector3(12, 34, 56);
+            testMovingCamera.Subject = null;
 
             // Act
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
 
             // Assert
-            Assert.AreEqual(subjectLocation.position.y, cameraLocation.position.y);
+            Assert.Pass();
         }
         
         [UnityTest]
-        public IEnumerator FrameAdvance_CameraZDoesNotChange_WhenSubjectMovesTest()
+        public IEnumerator FrameAdvance_NoErrorsThrown_WhenSubjectDoesNotMoveTest() 
         {
-            int expectedZ = -4;
+            // Arrange
+
+            // Act
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+
+            // Assert
+            Assert.Pass();
+        }
+    }
+
+    /// <summary>
+    /// Attempt to test the abstract behaviours.
+    /// Only used in testing.
+    /// </summary>
+    public class TestMovingCamera : MovingCamera
+    {
+        protected override void MoveCameraToSubject(Transform subject, Transform camera)
+        {
             
-            // Arrange
-            cameraLocation.position = new Vector3(3, 6, expectedZ);
-            subjectLocation.position = new Vector3(12, 34, 56);
-
-            // Act
-            yield return new WaitForEndOfFrame();
-            yield return new WaitForEndOfFrame();
-
-            // Assert
-            Assert.AreEqual(expectedZ, cameraLocation.position.z);
         }
     }
 }
