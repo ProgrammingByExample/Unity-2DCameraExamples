@@ -1,9 +1,7 @@
 {
-    "name": "MatchCamera",
-    "rootNamespace": "",
-    "references": [
-        "GUID:2d7303090486352408c939f7c0d06aed"
-    ],
+    "name": "FollowCameraAPI",
+    "rootNamespace": "FollowCamera",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

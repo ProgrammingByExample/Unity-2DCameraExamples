@@ -1,10 +1,10 @@
 {
-    "name": "MatchCameraTests",
+    "name": "FollowCameraPlayTests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "MatchCamera"
+        "FollowCamera"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

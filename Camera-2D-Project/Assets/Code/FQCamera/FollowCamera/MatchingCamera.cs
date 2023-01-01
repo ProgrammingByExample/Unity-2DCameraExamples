@@ -2,8 +2,8 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("MatchCameraTests")]
-namespace Code.FQCamera.MatchCamera
+[assembly: InternalsVisibleTo("FollowCameraPlayTests")]
+namespace Code.FQCamera.FollowCamera
 {
     /// <summary>
     /// Camera which moves to the exact location of the given subject
