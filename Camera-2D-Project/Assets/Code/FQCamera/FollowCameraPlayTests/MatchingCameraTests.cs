@@ -6,9 +6,9 @@ using UnityEngine.TestTools;
 
 namespace Code.FQCamera.FollowCameraPlayTests
 {
-    public class MatchCamTests
+    public class MatchingCameraTests
     {
-        private MatchCam testMatchCam;
+        private MatchingCamera testMatchingCamera;
         private Transform cameraLocation;
         private Transform subjectLocation;
 
@@ -26,13 +26,13 @@ namespace Code.FQCamera.FollowCameraPlayTests
             subjectLocation = subjectObject.GetComponent<Transform>();
             
             holderObject = new GameObject();
-            testMatchCam = holderObject.AddComponent<MatchCam>();
-            testMatchCam.Camera = cameraLocation;
-            testMatchCam.Subject = subjectLocation;
+            testMatchingCamera = holderObject.AddComponent<MatchingCamera>();
+            testMatchingCamera.Camera = cameraLocation;
+            testMatchingCamera.Subject = subjectLocation;
             
             // Simply stops the class from logging messages.
-            testMatchCam.haveLoggedCameraIsNull = true;
-            testMatchCam.haveLoggedSubjectIsNull = true;
+            testMatchingCamera.haveLoggedCameraIsNull = true;
+            testMatchingCamera.haveLoggedSubjectIsNull = true;
         }
 
         [TearDown]
@@ -47,7 +47,7 @@ namespace Code.FQCamera.FollowCameraPlayTests
         public IEnumerator FrameAdvance_NoErrorsThrown_WhenNoCameraGivenTest() 
         {
             // Arrange
-            testMatchCam.Camera = null;
+            testMatchingCamera.Camera = null;
 
             // Act
             yield return new WaitForEndOfFrame();
@@ -61,7 +61,7 @@ namespace Code.FQCamera.FollowCameraPlayTests
         public IEnumerator FrameAdvance_NoErrorsThrown_WhenNoSubjectGivenTest() 
         {
             // Arrange
-            testMatchCam.Subject = null;
+            testMatchingCamera.Subject = null;
 
             // Act
             yield return new WaitForEndOfFrame();

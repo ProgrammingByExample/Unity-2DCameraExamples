@@ -8,17 +8,23 @@ namespace Code.FQCamera.FollowCamera
     /// <summary>
     /// Camera which moves to the exact location of the given subject
     /// </summary>
-    public class MatchCam : MonoBehaviour
+    public class MatchingCamera : MonoBehaviour, IFollowCamera
     {
         /// <summary>
         /// Camera to move.
         /// </summary>
-        public Transform Camera;
+        public Transform Camera { get => camera; set => camera = value; }
+        
+        [SerializeField]
+        private Transform camera;
         
         /// <summary>
         /// Subject to move to.
         /// </summary>
-        public Transform Subject;
+        public Transform Subject { get => subject; set => subject = value; }
+        
+        [SerializeField]
+        private Transform subject;
         
         /// <summary>
         /// True means the Subject having a null state has already been logged.
@@ -55,7 +61,7 @@ namespace Code.FQCamera.FollowCamera
         }
 
         /// <summary>
-        /// Verifies the Objects used for the <see cref="MatchCam"/> class.
+        /// Verifies the Objects used for the <see cref="MatchingCamera"/> class.
         /// </summary>
         /// <returns> True means valid. </returns>
         private bool VerifyGivenObjects()
@@ -101,7 +107,7 @@ namespace Code.FQCamera.FollowCamera
         {
             if (!singleLogToggle)
             {
-                Debug.LogWarning($"{typeof(MatchCam)}: {logMessage}");
+                Debug.LogWarning($"{typeof(MatchingCamera)}: {logMessage}");
                 singleLogToggle = true;
             }
         }
