@@ -44,6 +44,8 @@ namespace Code.FQCamera.FollowCamera
         {
             this.haveLoggedSubjectIsNull = false;
             this.haveLoggedCameraIsNull = false;
+
+            Initialise();
         }
 
         /// <summary>
@@ -105,5 +107,10 @@ namespace Code.FQCamera.FollowCamera
         /// <param name="subject"> Subject to move to. </param>
         /// <param name="camera"> Camera to move. </param>
         protected abstract void MoveCameraToSubject(Transform subject, Transform camera);
+        
+        /// <summary>
+        /// Called at the end of <see cref="Start"/>.
+        /// </summary>
+        protected virtual void Initialise(){}
     }
 }

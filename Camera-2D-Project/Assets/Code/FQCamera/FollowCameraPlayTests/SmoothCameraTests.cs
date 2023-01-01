@@ -38,7 +38,5 @@ namespace Code.FQCamera.FollowCameraPlayTests
             Object.DestroyImmediate(subjectObject);
             Object.DestroyImmediate(holderObject);
         }
-
-        
     }
 }
