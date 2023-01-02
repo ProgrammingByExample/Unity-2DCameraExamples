@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("FollowCameraPlayTests")]
 namespace Code.FQCamera.FollowCamera
 {
     /// <summary>

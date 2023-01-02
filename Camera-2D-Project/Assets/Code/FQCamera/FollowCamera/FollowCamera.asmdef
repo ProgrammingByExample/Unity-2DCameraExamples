@@ -2,7 +2,9 @@
     "name": "FollowCamera",
     "rootNamespace": "",
     "references": [
-        "GUID:2d7303090486352408c939f7c0d06aed"
+        "GUID:2d7303090486352408c939f7c0d06aed",
+        "GUID:23f6e99d8b92a00478aca8569cf36f45",
+        "GUID:ed868d34f0e9d6f4b9d81191593dbe69"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

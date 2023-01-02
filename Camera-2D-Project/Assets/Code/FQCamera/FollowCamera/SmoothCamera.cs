@@ -1,7 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Code.FQUnityAPI.GameStatics;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("FollowCameraPlayTests")]
 namespace Code.FQCamera.FollowCamera
 {
     /// <summary>
@@ -9,14 +10,25 @@ namespace Code.FQCamera.FollowCamera
     /// </summary>
     public class SmoothCamera : MovingCamera
     {
-        public int hello = 1;
+        /// <summary>
+        /// Unity's time implementation.
+        /// </summary>
+        private IUnityTime unityTime;
         
+        /// <summary>
+        /// Methods for Unity Statics.
+        /// Instead of using the actual Unity Statics, these are used.
+        /// <c>Only testing sets this</c>
+        /// </summary>
+        internal IUnityStaticsFactory unityStaticsFactory;
+
         /// <summary>
         /// Called at the end of <see cref="Start"/>.
         /// </summary>
         protected override void Initialise()
         {
-            
+            unityStaticsFactory ??= new UnityStaticsFactory();
+            unityTime = unityStaticsFactory.GetTime();
         }
         
         /// <summary>
@@ -26,9 +38,13 @@ namespace Code.FQCamera.FollowCamera
         /// <param name="camera"> Camera to move. </param>
         protected override void MoveCameraToSubject(Transform subject, Transform camera)
         {
-            Vector3 newPosition = subject.position;
+            Vector3 goalPosition = subject.position;
             Vector3 cameraPosition = camera.position;
-            camera.position = new Vector3(newPosition.x, newPosition.y, cameraPosition.z);
+            goalPosition.z = cameraPosition.z;
+            
+            float delta = unityTime.DeltaTime;
+            
+            camera.position = Vector3.Lerp(cameraPosition, goalPosition, delta);
         }
     }
 }
