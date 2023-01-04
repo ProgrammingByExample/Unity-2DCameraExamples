@@ -49,17 +49,17 @@ namespace Code.FQCamera.FollowCameraPlayTests
         {
             var startingSubjectPosition = new Vector3(12, 34, 56);
             var startingCameraPosition = new Vector3(54, 76, 23);
-            float givenDealtaTime = 0.1f;
+            float givenTime = 1;
             
             // Arrange
             SetUp();
             MakeStaticsAndTimeFactory();
-            mockTime.SetupGet(x => x.DeltaTime).Returns(givenDealtaTime);
+            mockTime.SetupGet(x => x.Time).Returns(givenTime);
             
             subjectLocation.position = startingSubjectPosition;
             cameraLocation.position = startingCameraPosition;
 
-            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, givenDealtaTime);
+            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, 0);
 
             // Act
             yield return new WaitForEndOfFrame();
@@ -75,17 +75,17 @@ namespace Code.FQCamera.FollowCameraPlayTests
         {
             var startingSubjectPosition = new Vector3(12, 34, 56);
             var startingCameraPosition = new Vector3(54, 76, 23);
-            float givenDealtaTime = 0.1f;
+            float givenTime = 1f;
             
             // Arrange
             SetUp();
             MakeStaticsAndTimeFactory();
-            mockTime.SetupGet(x => x.DeltaTime).Returns(givenDealtaTime);
+            mockTime.SetupGet(x => x.Time).Returns(givenTime);
             
             subjectLocation.position = startingSubjectPosition;
             cameraLocation.position = startingCameraPosition;
 
-            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, givenDealtaTime);
+            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, givenTime);
 
             // Act
             yield return new WaitForEndOfFrame();
@@ -94,7 +94,75 @@ namespace Code.FQCamera.FollowCameraPlayTests
             // Assert
             Assert.AreEqual(startingCameraPosition.z, cameraLocation.position.z);
         }
+        
+        [UnityTest]
+        public IEnumerator FrameAdvanceTwice_CameraLerpUsesOriginStartPosition_WhenSubjectIsBeyondPointOneDistanceTest()  
+        {
+            var startingSubjectPosition = new Vector3(12, 34, 56);
+            var startingCameraPosition = new Vector3(54, 76, 23);
+            float givenTime = 1f;
+            
+            // Arrange
+            SetUp();
+            MakeStaticsAndTimeFactory();
+            mockTime.SetupGet(x => x.Time).Returns(givenTime);
+            
+            subjectLocation.position = startingSubjectPosition;
+            cameraLocation.position = startingCameraPosition;
+            
+            float distCovered = (givenTime - (givenTime * 2)) * 1f;
+            float journeyLength = Vector3.Distance(startingCameraPosition, startingSubjectPosition);
+            startingSubjectPosition.z = startingCameraPosition.z;
+            float fractionOfJourney = distCovered / journeyLength;
+            
+            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, fractionOfJourney);
 
+            // Act
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+
+            // Assert
+            Assert.AreEqual(startingCameraPosition.x, cameraLocation.position.x);
+            Assert.AreEqual(startingCameraPosition.y, cameraLocation.position.y);
+        }
+        
+        [UnityTest]
+        public IEnumerator FrameAdvance3Times_CameraLerpUsesOriginStartPosition_WhenSubjectIsBeyondPointOneDistanceTest()  
+        {
+            var startingSubjectPosition = new Vector3(12, 34, 56);
+            var startingCameraPosition = new Vector3(54, 76, 23);
+            float givenTime = 1f;
+            
+            // Arrange
+            SetUp();
+            MakeStaticsAndTimeFactory();
+            mockTime.SetupGet(x => x.Time).Returns(givenTime);
+            
+            subjectLocation.position = startingSubjectPosition;
+            cameraLocation.position = startingCameraPosition;
+            
+            float distCovered = (givenTime - (givenTime * 3)) * 1f;
+            float journeyLength = Vector3.Distance(startingCameraPosition, startingSubjectPosition);
+            startingSubjectPosition.z = startingCameraPosition.z;
+            float fractionOfJourney = distCovered / journeyLength;
+            
+            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, fractionOfJourney);
+
+            // Act
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+
+            // Assert
+            Assert.AreEqual(startingCameraPosition.x, cameraLocation.position.x);
+            Assert.AreEqual(startingCameraPosition.y, cameraLocation.position.y);
+        }
+
+        /// <summary>
+        /// Creates a statics factory and time static within it
+        /// </summary>
         private void MakeStaticsAndTimeFactory()
         {
             mockStaticFactory = new Mock<IUnityStaticsFactory>();

@@ -14,6 +14,26 @@ namespace Code.FQCamera.FollowCamera
         /// Unity's time implementation.
         /// </summary>
         private IUnityTime unityTime;
+
+        /// <summary>
+        /// True means we have recognised that moving is something to do and are now doing it.
+        /// </summary>
+        private bool areFollowing;
+
+        /// <summary>
+        /// Position at the start of movement.
+        /// </summary>
+        private Vector3 startPosition;
+        
+        /// <summary>
+        /// How for to travel to the target
+        /// </summary>
+        private float journeyLength;
+        
+        /// <summary>
+        /// Seconds in the application when we started moving.
+        /// </summary>
+        private float startTime;
         
         /// <summary>
         /// Methods for Unity Statics.
@@ -42,9 +62,29 @@ namespace Code.FQCamera.FollowCamera
             Vector3 cameraPosition = camera.position;
             goalPosition.z = cameraPosition.z;
             
-            float delta = unityTime.DeltaTime;
-            
-            camera.position = Vector3.Lerp(cameraPosition, goalPosition, delta);
+            if (!this.areFollowing)
+            {
+                this.journeyLength = Vector3.Distance(cameraPosition, goalPosition);
+                if (this.journeyLength > 0.001f)
+                {
+                    this.startPosition = new Vector3(cameraPosition.x,cameraPosition.y,cameraPosition.z);
+                    this.startTime = this.unityTime.Time;
+                    this.areFollowing = true;
+                }
+            }
+
+            if (this.areFollowing)
+            {
+                float distCovered = (this.unityTime.Time - startTime) * 1f;
+                float fractionOfJourney = distCovered / journeyLength;
+                camera.position = Vector3.Lerp(startPosition, goalPosition, fractionOfJourney);
+
+                if (Vector3.Distance(cameraPosition, goalPosition) <= 0.001f)
+                {
+                    camera.position = goalPosition;
+                    this.areFollowing = false;
+                }
+            }
         }
     }
 }
