@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System;
 using Code.FQUnityAPI.GameStatics;
 using UnityEngine;
 
@@ -10,6 +9,11 @@ namespace Code.FQ.Camera.FollowCamera
     /// </summary>
     public class SmoothCamera : MovingCamera
     {
+        /// <summary>
+        /// How fast to follow.
+        /// </summary>
+        public const float MovementSpeed = 2;
+        
         /// <summary>
         /// Unity's time implementation.
         /// </summary>
@@ -24,6 +28,11 @@ namespace Code.FQ.Camera.FollowCamera
         /// Position at the start of movement.
         /// </summary>
         private Vector3 startPosition;
+        
+        /// <summary>
+        /// The original position of the goal.
+        /// </summary>
+        private Vector3 goalPosition;
         
         /// <summary>
         /// How for to travel to the target
@@ -47,8 +56,8 @@ namespace Code.FQ.Camera.FollowCamera
         /// </summary>
         protected override void Initialise()
         {
-            unityStaticsFactory ??= new UnityStaticsFactory();
-            unityTime = unityStaticsFactory.GetTime();
+            this.unityStaticsFactory ??= new UnityStaticsFactory();
+            this.unityTime = unityStaticsFactory.GetTime();
         }
         
         /// <summary>
@@ -61,30 +70,105 @@ namespace Code.FQ.Camera.FollowCamera
             Vector3 goalPosition = subject.position;
             Vector3 cameraPosition = camera.position;
             goalPosition.z = cameraPosition.z;
-            
-            if (!this.areFollowing)
-            {
-                this.journeyLength = Vector3.Distance(cameraPosition, goalPosition);
-                if (this.journeyLength > 0.001f)
-                {
-                    this.startPosition = new Vector3(cameraPosition.x,cameraPosition.y,cameraPosition.z);
-                    this.startTime = this.unityTime.Time;
-                    this.areFollowing = true;
-                }
-            }
 
+            SetupToMoveIfNotMovingAndFarEnough(goalPosition, cameraPosition);
+            MoveToGoal(goalPosition, this.startPosition, camera);
+        }
+
+        /// <summary>
+        /// Moves to the goal if following the subject.
+        /// </summary>
+        /// <param name="goalPosition"> The location to aim for. </param>
+        /// <param name="startCameraPosition"> The start position. </param>
+        /// <param name="camera"> The current camera Transform. </param>
+        private void MoveToGoal(Vector3 goalPosition, Vector3 startCameraPosition, Transform camera)
+        {
             if (this.areFollowing)
             {
-                float distCovered = (this.unityTime.Time - startTime) * 1f;
-                float fractionOfJourney = distCovered / journeyLength;
-                camera.position = Vector3.Lerp(startPosition, goalPosition, fractionOfJourney);
+                float distCovered = (this.unityTime.Time - startTime) * MovementSpeed;
+                float fractionOfJourney = distCovered / this.journeyLength;
+                camera.position = Vector3.Lerp(startCameraPosition, goalPosition, fractionOfJourney);
 
-                if (Vector3.Distance(cameraPosition, goalPosition) <= 0.001f)
+                StopMovementIfCloseEnough(goalPosition, camera.position, camera);
+            }
+        }
+
+        /// <summary>
+        /// Will stop movement if the camera is now close enough.
+        /// </summary>
+        /// <param name="goalPosition"> The location to aim for. </param>
+        /// <param name="cameraPosition"> Camera current position. </param>
+        /// <param name="camera"> The current camera Transform. </param>
+        private void StopMovementIfCloseEnough(Vector3 goalPosition, Vector3 cameraPosition, Transform camera)
+        {
+            if (AreCloseEnough(goalPosition, cameraPosition))
+            {
+                camera.position = goalPosition;
+                this.areFollowing = false;
+            }
+        }
+
+        /// <summary>
+        /// Determines if the Camera is close enough to the goal.
+        /// </summary>
+        /// <param name="goalPosition"> The location to aim for. </param>
+        /// <param name="cameraPosition"> Camera current position. </param>
+        /// <returns> True means the camera has reached the goal. </returns>
+        private bool AreCloseEnough(Vector3 goalPosition, Vector3 cameraPosition)
+        {
+            return Vector3.Distance(cameraPosition, goalPosition) <= 0.001f;
+        }
+
+        /// <summary>
+        /// Sets up a moving start if far enough from the subject.
+        /// </summary>
+        /// <param name="goalPosition"> The location to aim for. </param>
+        /// <param name="cameraPosition"> Camera current position. </param>
+        private void SetupToMoveIfNotMovingAndFarEnough(Vector3 goalPosition, Vector3 cameraPosition)
+        {
+            if (!this.areFollowing)
+            {
+                SetupToMoveIfFarEnough(goalPosition, cameraPosition);
+            }
+            
+            if (this.areFollowing) 
+            {
+                var currentJourney = Vector3.Distance(this.goalPosition, goalPosition);
+                if(currentJourney >= 5)
                 {
-                    camera.position = goalPosition;
-                    this.areFollowing = false;
+                    SetupToMoveIfFarEnough(goalPosition, cameraPosition);
                 }
             }
+        }
+
+        /// <summary>
+        /// Will set up to move if the subject is far enough.
+        /// </summary>
+        /// <param name="goalPosition"> The location to aim for. </param>
+        /// <param name="cameraPosition"> Camera current position. </param>
+        private void SetupToMoveIfFarEnough(Vector3 goalPosition, Vector3 cameraPosition)
+        {
+            if (AreFarEnoughToMove(goalPosition, cameraPosition, out float distance))
+            {
+                this.journeyLength = distance;
+                this.startPosition = new Vector3(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+                this.goalPosition = new Vector3(goalPosition.x, goalPosition.y, goalPosition.z);
+                this.startTime = this.unityTime.Time;
+                this.areFollowing = true;
+            }
+        }
+
+        /// <summary>
+        /// Determines if the subject is far enough away.
+        /// </summary>
+        /// <param name="goalPosition"> The location to aim for. </param>
+        /// <param name="cameraPosition"> Camera current position. </param>
+        /// <param name="distance"> Returns the actual distance it is away. </param>
+        /// <returns> True means it is far enough to move to. </returns>
+        private bool AreFarEnoughToMove(Vector3 goalPosition, Vector3 cameraPosition, out float distance)
+        {
+            distance = Vector3.Distance(cameraPosition, goalPosition);
+            return distance > 0.001f;
         }
     }
 }

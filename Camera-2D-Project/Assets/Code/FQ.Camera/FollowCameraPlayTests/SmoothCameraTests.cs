@@ -53,7 +53,7 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
             // Arrange
             SetUp();
             MakeStaticsAndTimeFactory();
-            mockTime.SetupGet(x => x.Time).Returns(givenTime);
+            mockTime.SetupGet(x => x.Time).Returns(() => givenTime);
             
             subjectLocation.position = startingSubjectPosition;
             cameraLocation.position = startingCameraPosition;
@@ -79,7 +79,7 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
             // Arrange
             SetUp();
             MakeStaticsAndTimeFactory();
-            mockTime.SetupGet(x => x.Time).Returns(givenTime);
+            mockTime.SetupGet(x => x.Time).Returns(() => givenTime);
             
             subjectLocation.position = startingSubjectPosition;
             cameraLocation.position = startingCameraPosition;
@@ -97,21 +97,20 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
         [UnityTest]
         public IEnumerator FrameAdvanceTwice_CameraLerpUsesOriginStartPosition_WhenSubjectIsBeyondPointOneDistanceTest()  
         {
-            var startingSubjectPosition = new Vector3(12, 34, 56);
+            var startingSubjectPosition = new Vector3(12, 34, 23);
             var startingCameraPosition = new Vector3(54, 76, 23);
             float givenTime = 1f;
             
             // Arrange
             SetUp();
             MakeStaticsAndTimeFactory();
-            mockTime.SetupGet(x => x.Time).Returns(givenTime);
+            mockTime.SetupGet(x => x.Time).Returns(() => givenTime);
             
             subjectLocation.position = startingSubjectPosition;
             cameraLocation.position = startingCameraPosition;
             
-            float distCovered = (givenTime - (givenTime * 2)) * 1f;
+            float distCovered = ((givenTime * 2) - givenTime) * SmoothCamera.MovementSpeed;
             float journeyLength = Vector3.Distance(startingCameraPosition, startingSubjectPosition);
-            startingSubjectPosition.z = startingCameraPosition.z;
             float fractionOfJourney = distCovered / journeyLength;
             
             Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, fractionOfJourney);
@@ -119,31 +118,31 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
             // Act
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
+            ++givenTime;
             yield return new WaitForEndOfFrame();
 
             // Assert
-            Assert.AreEqual(startingCameraPosition.x, cameraLocation.position.x);
-            Assert.AreEqual(startingCameraPosition.y, cameraLocation.position.y);
+            Assert.AreEqual(expectedLerp.x, cameraLocation.position.x);
+            Assert.AreEqual(expectedLerp.y, cameraLocation.position.y);
         }
         
         [UnityTest]
         public IEnumerator FrameAdvance3Times_CameraLerpUsesOriginStartPosition_WhenSubjectIsBeyondPointOneDistanceTest()  
         {
-            var startingSubjectPosition = new Vector3(12, 34, 56);
+            var startingSubjectPosition = new Vector3(12, 34, 23);
             var startingCameraPosition = new Vector3(54, 76, 23);
             float givenTime = 1f;
             
             // Arrange
             SetUp();
             MakeStaticsAndTimeFactory();
-            mockTime.SetupGet(x => x.Time).Returns(givenTime);
+            mockTime.SetupGet(x => x.Time).Returns(() => givenTime);
             
             subjectLocation.position = startingSubjectPosition;
             cameraLocation.position = startingCameraPosition;
-            
-            float distCovered = (givenTime - (givenTime * 3)) * 1f;
+
+            float distCovered = ((givenTime * 3) - givenTime) * SmoothCamera.MovementSpeed;
             float journeyLength = Vector3.Distance(startingCameraPosition, startingSubjectPosition);
-            startingSubjectPosition.z = startingCameraPosition.z;
             float fractionOfJourney = distCovered / journeyLength;
             
             Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, startingSubjectPosition, fractionOfJourney);
@@ -151,12 +150,40 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
             // Act
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
+            ++givenTime;
             yield return new WaitForEndOfFrame();
+            ++givenTime;
             yield return new WaitForEndOfFrame();
 
             // Assert
-            Assert.AreEqual(startingCameraPosition.x, cameraLocation.position.x);
-            Assert.AreEqual(startingCameraPosition.y, cameraLocation.position.y);
+            Assert.AreEqual(expectedLerp.x, cameraLocation.position.x);
+            Assert.AreEqual(expectedLerp.y, cameraLocation.position.y);
+        }
+
+        [UnityTest]
+        public IEnumerator FrameAdvance_CameraSnapsToExactPosition_WhenSubjectIsExactlyMarginAwayTest()  
+        {
+            var startingSubjectPosition = new Vector3(12.1f, 34, 56);
+            var startingCameraPosition = new Vector3(12, 34, 56);
+            float givenTime = 1f;
+            
+            // Arrange
+            SetUp();
+            MakeStaticsAndTimeFactory();
+            mockTime.SetupGet(x => x.Time).Returns(() => givenTime);
+            
+            subjectLocation.position = startingSubjectPosition;
+            cameraLocation.position = startingCameraPosition;
+
+            // Act
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            ++givenTime;
+            yield return new WaitForEndOfFrame();
+
+            // Assert
+            Assert.AreEqual(startingSubjectPosition.x, cameraLocation.position.x);
+            Assert.AreEqual(startingSubjectPosition.y, cameraLocation.position.y);
         }
 
         /// <summary>
