@@ -1,6 +1,6 @@
 {
     "name": "FollowCameraAPI",
-    "rootNamespace": "FollowCamera",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

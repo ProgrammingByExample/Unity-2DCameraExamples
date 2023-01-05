@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace Code.FQCamera.FollowCamera
+namespace Code.FQ.Camera.FollowCamera
 {
     /// <summary>
     /// Moves the camera to the given subject.

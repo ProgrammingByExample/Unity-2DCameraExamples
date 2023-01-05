@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Code.FQCamera.FollowCamera
+namespace Code.FQ.Camera.FollowCamera
 {
     /// <summary>
     /// A game object with the aim to follow another camera object around.

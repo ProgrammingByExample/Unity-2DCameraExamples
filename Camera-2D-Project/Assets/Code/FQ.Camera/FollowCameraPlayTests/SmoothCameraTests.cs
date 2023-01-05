@@ -1,13 +1,12 @@
 ﻿using System.Collections;
-using Code.FQCamera.FollowCamera;
+using Code.FQ.Camera.FollowCamera;
 using Code.FQUnityAPI.GameStatics;
 using Moq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using Vector2 = System.Numerics.Vector2;
 
-namespace Code.FQCamera.FollowCameraPlayTests
+namespace Code.FQ.Camera.FollowCameraPlayTests
 {
     public class SmoothCameraTests
     {
