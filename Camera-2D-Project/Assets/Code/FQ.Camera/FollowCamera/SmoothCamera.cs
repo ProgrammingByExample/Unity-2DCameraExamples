@@ -15,6 +15,11 @@ namespace Code.FQ.Camera.FollowCamera
         public const float MovementSpeed = 2;
         
         /// <summary>
+        /// How far away a subject needs to be before the speed is recalculated
+        /// </summary>
+        public const int DistanceToAlterSpeed = 5;
+        
+        /// <summary>
         /// Unity's time implementation.
         /// </summary>
         private IUnityTime unityTime;
@@ -72,6 +77,12 @@ namespace Code.FQ.Camera.FollowCamera
             goalPosition.z = cameraPosition.z;
 
             SetupToMoveIfNotMovingAndFarEnough(goalPosition, cameraPosition);
+
+            if (this.areFollowing)
+            {
+                RecalculateJourneyLengthIfFarEnough(goalPosition, cameraPosition);
+            }
+            
             MoveToGoal(goalPosition, this.startPosition, camera);
         }
 
@@ -130,14 +141,20 @@ namespace Code.FQ.Camera.FollowCamera
             {
                 SetupToMoveIfFarEnough(goalPosition, cameraPosition);
             }
-            
-            if (this.areFollowing) 
+        }
+
+        /// <summary>
+        /// Recalculates journey length if the target has moved far enough away.
+        /// Uses <see cref="DistanceToAlterSpeed"/> to figure this out.
+        /// </summary>
+        /// <param name="currentSubjectPosition"> The current subject position. </param>
+        /// <param name="cameraPosition"> Current Camera position. </param>
+        private void RecalculateJourneyLengthIfFarEnough(Vector3 currentSubjectPosition, Vector3 cameraPosition)
+        {
+            var currentJourney = Vector3.Distance(this.goalPosition, currentSubjectPosition);
+            if (currentJourney >= DistanceToAlterSpeed)
             {
-                var currentJourney = Vector3.Distance(this.goalPosition, goalPosition);
-                if(currentJourney >= 5)
-                {
-                    SetupToMoveIfFarEnough(goalPosition, cameraPosition);
-                }
+                SetupToMoveIfFarEnough(currentSubjectPosition, cameraPosition);
             }
         }
 

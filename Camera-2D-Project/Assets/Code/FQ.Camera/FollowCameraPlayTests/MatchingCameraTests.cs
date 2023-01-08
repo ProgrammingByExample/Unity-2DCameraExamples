@@ -16,8 +16,11 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
         private GameObject subjectObject;
         private GameObject holderObject;
         
-        [SetUp]
-        public void Setup()
+        /// <summary>
+        /// Setup must be run manually when using <see cref="IEnumerator"/> as running this as
+        /// an actual setup may causes Start and Update to run before tests.
+        /// </summary>
+        private void Setup()
         {
             cameraObject = new GameObject();
             cameraLocation = cameraObject.GetComponent<Transform>();
@@ -40,8 +43,10 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
         }
 
         [UnityTest]
-        public IEnumerator FrameAdvance_CameraPositionMatchesX_WhenSubjectMovesTest() 
+        public IEnumerator FrameAdvance_CameraPositionMatchesX_WhenSubjectMovesTest()
         {
+            Setup();
+            
             // Arrange
             subjectLocation.position = new Vector3(12, 34, 56);
 
@@ -54,8 +59,10 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
         }
         
         [UnityTest]
-        public IEnumerator FrameAdvance_CameraPositionMatchesY_WhenSubjectMovesTest() 
+        public IEnumerator FrameAdvance_CameraPositionMatchesY_WhenSubjectMovesTest()
         {
+            Setup();
+            
             // Arrange
             subjectLocation.position = new Vector3(12, 34, 56);
 
@@ -70,6 +77,7 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
         [UnityTest]
         public IEnumerator FrameAdvance_CameraZDoesNotChange_WhenSubjectMovesTest()
         {
+            Setup();
             int expectedZ = -4;
             
             // Arrange

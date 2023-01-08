@@ -21,6 +21,10 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
         private Mock<IUnityTime> mockTime;
         private Mock<IUnityStaticsFactory> mockStaticFactory;
         
+        /// <summary>
+        /// Setup must be run manually when using <see cref="IEnumerator"/> as running this as
+        /// an actual setup may causes Start and Update to run before tests.
+        /// </summary>
         private void SetUp()
         {
             cameraObject = new GameObject();
@@ -184,6 +188,46 @@ namespace Code.FQ.Camera.FollowCameraPlayTests
             // Assert
             Assert.AreEqual(startingSubjectPosition.x, cameraLocation.position.x);
             Assert.AreEqual(startingSubjectPosition.y, cameraLocation.position.y);
+        }
+        
+        [UnityTest]
+        public IEnumerator FrameAdvanceTwice_CameraChangesSpeed_WhenSubjectMovesFarAwayTest()  
+        {
+            var startingSubjectPosition = new Vector3(12, 34, 23);
+            var nextSubjectPosition = new Vector3(35, 34, 23);
+            var startingCameraPosition = new Vector3(54, 76, 23);
+            float givenTime = 1f;
+            
+            // Arrange
+            SetUp();
+            MakeStaticsAndTimeFactory();
+            mockTime.SetupGet(x => x.Time).Returns(() => givenTime);
+            
+            cameraLocation.position = startingCameraPosition;
+            
+            float distCovered = ((givenTime * 2) - givenTime) * SmoothCamera.MovementSpeed;
+            float journeyLength = Vector3.Distance(startingCameraPosition, nextSubjectPosition);
+            float fractionOfJourney = distCovered / journeyLength;
+            
+            // The test is the fraction of the Journey, the Journey Length changes and this changes.
+            Vector3 expectedLerp = Vector3.Lerp(startingCameraPosition, nextSubjectPosition, fractionOfJourney);
+            
+            // Run the first frame
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            ++givenTime;
+
+            // Act
+            subjectLocation.position = nextSubjectPosition;
+            yield return new WaitForEndOfFrame();
+            ++givenTime;
+            yield return new WaitForEndOfFrame();
+            ++givenTime;
+
+            // Assert
+            Vector3 camPosition = cameraLocation.position;
+            Assert.AreEqual(expectedLerp.x, camPosition.x);
+            Assert.AreEqual(expectedLerp.y, camPosition.y);
         }
 
         /// <summary>
