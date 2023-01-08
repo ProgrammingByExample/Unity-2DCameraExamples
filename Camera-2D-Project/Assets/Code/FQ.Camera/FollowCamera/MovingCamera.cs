@@ -1,24 +1,28 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using UnityEngine;
 
-[assembly: InternalsVisibleTo("FollowCameraPlayTests")]
-namespace Code.FQCamera.FollowCamera
+namespace Code.FQ.Camera.FollowCamera
 {
     /// <summary>
-    /// Camera which moves to the exact location of the given subject
+    /// Moves the camera to the given subject.
     /// </summary>
-    public class MatchCam : MonoBehaviour
+    public abstract class MovingCamera : MonoBehaviour, IFollowCamera
     {
         /// <summary>
         /// Camera to move.
         /// </summary>
-        public Transform Camera;
+        public Transform Camera { get => camera; set => camera = value; }
+        
+        [SerializeField]
+        private Transform camera;
         
         /// <summary>
         /// Subject to move to.
         /// </summary>
-        public Transform Subject;
+        public Transform Subject { get => subject; set => subject = value; }
+        
+        [SerializeField]
+        private Transform subject;
         
         /// <summary>
         /// True means the Subject having a null state has already been logged.
@@ -39,6 +43,8 @@ namespace Code.FQCamera.FollowCamera
         {
             this.haveLoggedSubjectIsNull = false;
             this.haveLoggedCameraIsNull = false;
+
+            Initialise();
         }
 
         /// <summary>
@@ -55,7 +61,7 @@ namespace Code.FQCamera.FollowCamera
         }
 
         /// <summary>
-        /// Verifies the Objects used for the <see cref="MatchCam"/> class.
+        /// Verifies the Objects used for the <see cref="MatchingCamera"/> class.
         /// </summary>
         /// <returns> True means valid. </returns>
         private bool VerifyGivenObjects()
@@ -77,18 +83,6 @@ namespace Code.FQCamera.FollowCamera
         }
 
         /// <summary>
-        /// Moves the Camera to the given Subject if both are found.
-        /// </summary>
-        /// <param name="subject"> Subject to move to. </param>
-        /// <param name="camera"> Camera to move. </param>
-        private void MoveCameraToSubject(Transform subject, Transform camera)
-        {
-            Vector3 newPosition = subject.position;
-            Vector3 cameraPosition = camera.position;
-            camera.position = new Vector3(newPosition.x, newPosition.y, cameraPosition.z);
-        }
-        
-        /// <summary>
         /// Logs a warning for the object with the given message.
         /// Does so once using the Toggle as indication of whether the message has been logged.
         /// </summary>
@@ -101,9 +95,21 @@ namespace Code.FQCamera.FollowCamera
         {
             if (!singleLogToggle)
             {
-                Debug.LogWarning($"{typeof(MatchCam)}: {logMessage}");
+                Debug.LogWarning($"{typeof(MatchingCamera)}: {logMessage}");
                 singleLogToggle = true;
             }
         }
+        
+        /// <summary>
+        /// Moves the Camera to the given Subject if both are found.
+        /// </summary>
+        /// <param name="subject"> Subject to move to. </param>
+        /// <param name="camera"> Camera to move. </param>
+        protected abstract void MoveCameraToSubject(Transform subject, Transform camera);
+        
+        /// <summary>
+        /// Called at the end of <see cref="Start"/>.
+        /// </summary>
+        protected virtual void Initialise(){}
     }
 }
